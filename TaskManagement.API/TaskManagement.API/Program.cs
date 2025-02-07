@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.DataAccess;
+using TaskManagement.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,9 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Conf
     sqloptions.EnableRetryOnFailure(5);
     sqloptions.CommandTimeout(60);
 }));
+builder.Services.ConfigureCors();
+builder.Services.ConfigureIISIntegration();
+builder.Services.ConfigureLoggerService();
 
 var app = builder.Build();
 
@@ -23,10 +27,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}else { app.UseHsts(); }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All
+});
+app.UseCors("Corspolicy");
 app.UseAuthorization();
 
 app.MapControllers();
