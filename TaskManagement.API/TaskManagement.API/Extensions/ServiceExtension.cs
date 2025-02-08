@@ -1,4 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
+using TaskManagement.API.Services.Implementation;
+using TaskManagement.API.Services.Interface;
 using TaskManagement.API.Services.Logger;
 
 namespace TaskManagement.API.Extensions
@@ -29,5 +31,10 @@ namespace TaskManagement.API.Extensions
 
         public static void ConfigureLoggerService(this IServiceCollection services) => 
             services.AddSingleton<ILoggerServ, LoggerServImp>();
+
+        public static void ConfigureAuthService(this IServiceCollection services) =>
+            services.AddScoped<IAuthenticationService,AuthenticationServiceImp>();
+
+       // public static void 
     }
 }

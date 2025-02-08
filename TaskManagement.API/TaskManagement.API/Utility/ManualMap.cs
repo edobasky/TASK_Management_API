@@ -7,7 +7,12 @@ namespace TaskManagement.API.Utility
     {
        public static RegisteredUserResponseDto MapUserResponse(AppUser registerUser)
         {
-            return new RegisteredUserResponseDto(registerUser.Id,registerUser.Username, registerUser.Email);
+            return new RegisteredUserResponseDto(registerUser.Id,registerUser.Username,registerUser.Email);
+        }
+
+        public static UserDetailDto MapUserDetail(AppUser user)
+        {
+            return new UserDetailDto(user.Id,user.Username,user.Email,user.Role);
         }
     }
 }
