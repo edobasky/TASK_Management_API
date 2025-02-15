@@ -6,5 +6,9 @@ namespace TaskManagement.API.Services.Interface
     public interface IAuthenticationService
     {
         Task<GenericResponse<RegisteredUserResponseDto>> CreateNewUser(RegisterUserDto userDto);
+
+        Task<GenericResponse<LoginResponseDto>> LoginUserAsync(LoginDto loginDto);
+
+        Task<GenericResponse<UserDetailDto>> GetUserByIdAsync(int userId);
     }
 }
