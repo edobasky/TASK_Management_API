@@ -13,11 +13,13 @@ namespace TaskManagement.API.Services.Implementation
     {
         private readonly AppDbContext _appDb;
         private readonly ILoggerServ _logger;
+        private readonly IJWTService _jWTService;
 
-        public AuthenticationServiceImp(AppDbContext appDb,ILoggerServ logger)
+        public AuthenticationServiceImp(AppDbContext appDb,ILoggerServ logger,IJWTService jWTService)
         {
             _appDb = appDb;
             _logger = logger;
+            _jWTService = jWTService;
         }
 
         public async Task<GenericResponse<RegisteredUserResponseDto>> CreateNewUser(RegisterUserDto userDto)
@@ -111,5 +113,56 @@ namespace TaskManagement.API.Services.Implementation
             }
         }
 
+        public async Task<GenericResponse<LoginResponseDto>> LoginUserAsync(LoginDto loginDto)
+        {
+            try
+            {
+                #region Fetch and verify password
+                var getUser = await _appDb.AppUsers.FirstOrDefaultAsync(x => x.Email.Equals(loginDto.email));
+                if (getUser is null)
+                {
+                    _logger.LogInfo($"{nameof(LoginUserAsync)} Method call || User with Email : {loginDto.email} does not exist on the database");
+                    return new GenericResponse<LoginResponseDto>() { Successful = false, ResponseCode = "98", Message = "User account does not exist" };
+                }
+
+                bool PassCompare = BC.EnhancedVerify(loginDto.password, getUser.PasswordHash);
+
+                if (!PassCompare)
+                {
+                    _logger.LogWarn($"LoginUserAsync Method call || Invalid password provided by user with email : {loginDto.email}");
+
+                    return new GenericResponse<LoginResponseDto>()
+                    {
+                        Successful = false,
+                        ResponseCode = "96",
+                        Message = "Please provide appropriate credentials"
+                    };
+                }
+                #endregion
+
+             
+                var userToReturn = ManualMap.MapUserLoginResponse(getUser);
+
+                var createAccessToken = _jWTService.GenerateToken(getUser);
+
+                userToReturn.Token = createAccessToken.userToken;
+                userToReturn.tokenExpireIn = createAccessToken.tokenExpiryTime;
+
+                return new GenericResponse<LoginResponseDto>()
+                {
+                    Successful = true,
+                    ResponseCode = "00",
+                    Message = "User login successful",
+                    Data = userToReturn
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{nameof(LoginUserAsync)} Method called || an error occured during method operation =======> {ex}");
+                return new GenericResponse<LoginResponseDto> { Successful = false, ResponseCode = "99", Message = "We are unable to complete this request at this time,please try again" };
+
+            }
+
+        }
     }
 }

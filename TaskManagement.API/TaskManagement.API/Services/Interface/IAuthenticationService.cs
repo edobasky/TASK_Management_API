@@ -7,6 +7,8 @@ namespace TaskManagement.API.Services.Interface
     {
         Task<GenericResponse<RegisteredUserResponseDto>> CreateNewUser(RegisterUserDto userDto);
 
+        Task<GenericResponse<LoginResponseDto>> LoginUserAsync(LoginDto loginDto);
+
         Task<GenericResponse<UserDetailDto>> GetUserByIdAsync(int userId);
     }
 }

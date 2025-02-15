@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -6,6 +7,7 @@ using TaskManagement.API.DTOs;
 using TaskManagement.API.Model;
 using TaskManagement.API.Services.Interface;
 using TaskManagement.API.Services.Logger;
+using TaskManagement.API.Validations;
 
 namespace TaskManagement.API.Controllers
 {
@@ -23,23 +25,49 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> CreateNewUser(RegisterUserDto registerUserDto)
+        public async Task<IActionResult> CreateNewUser([FromBody]RegisterUserDto registerUserDto)
         {
-            if(!ModelState.IsValid)
-            {
-               var userResponse = new GenericResponse<RegisterUserDto>();
-                userResponse.Successful = false;
-                userResponse.ResponseCode = "98";
-                userResponse.Message = "Empty Properties";
+            var check = ModelValidationCheck(registerUserDto);
+            if (!check.Successful) return Ok(check);
 
-                return Ok(userResponse);
-            }
             _logger.LogInfo($"Request received with payload : {JsonConvert.SerializeObject(registerUserDto)} at {DateTime.UtcNow}");
             var createUserRes = await _authentication.CreateNewUser(registerUserDto);
 
             return Ok(createUserRes);
         }
 
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        public async Task<IActionResult> UserLogin([FromBody]LoginDto loginDto)
+        {
+            // validation goes here
+
+            var userLogin = await _authentication.LoginUserAsync(loginDto);
+
+            return Ok(userLogin);
+        }
+
+
+
+        #region user registration model validation
+        private static GenericResponse<dynamic> ModelValidationCheck(RegisterUserDto registerUserDto)
+        {
+            UserValidation _validator = new UserValidation();
+            var validResult = _validator.Validate(registerUserDto);
+            if (!validResult.IsValid)
+            {
+                return new GenericResponse<dynamic>()
+                {
+                    ResponseCode = "99",
+                    Successful = false,
+                    Message = String.Join(", ", validResult.Errors)
+                };
+            }
+            return new GenericResponse<dynamic>() { Successful = true, ResponseCode = "00" };
+        }
+        #endregion
+
+        [Authorize]
         [HttpGet("UserDetailById")]
         public async Task<IActionResult> GetUserDetail(int userId)
         {
