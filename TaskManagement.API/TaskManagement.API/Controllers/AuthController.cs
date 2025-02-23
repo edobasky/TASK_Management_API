@@ -67,7 +67,7 @@ namespace TaskManagement.API.Controllers
         }
         #endregion
 
-        [Authorize]
+      //  [Authorize]
         [HttpGet("UserDetailById")]
         public async Task<IActionResult> GetUserDetail(int userId)
         {
