@@ -10,5 +10,7 @@ namespace TaskManagement.API.Services.Interface
         Task<GenericResponse<LoginResponseDto>> LoginUserAsync(LoginDto loginDto);
 
         Task<GenericResponse<UserDetailDto>> GetUserByIdAsync(int userId);
+
+        Task<bool> UserExist(int UserId);
     }
 }

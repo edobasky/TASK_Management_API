@@ -27,5 +27,42 @@ namespace TaskManagement.API.Utility
 
             };
         }
+
+        public static TaskItem MapFromTaskCreateDto(TaskCreateDto taskCreateDto)
+        {
+            return new TaskItem
+            {
+                Title = taskCreateDto.Title,
+                Description = taskCreateDto.Description,
+                DueDate = taskCreateDto.DueDate,    
+                Priority = Enum.GetName(taskCreateDto.Priority) is null ? throw new Exception("Priority choosen does not exist") : Enum.GetName(taskCreateDto.Priority)!,
+                Status = Enum.GetName(taskCreateDto.Status)!,
+                CreatedAt = DateTime.UtcNow,
+                UserId = taskCreateDto.userId,
+            };
+        }
+
+        public static IEnumerable<TaskToReturnDto> MapToTaskReturn(IEnumerable<TaskItem> taskItem)
+        {
+            var TaskToReturn = taskItem.Select(x => new TaskToReturnDto
+            {
+                Id = x.Id,
+                Status = x.Status,
+                Priority = x.Priority,
+                DueDate = x.DueDate,
+            });
+
+            return TaskToReturn;
+        }
+
+        public static bool verifyEnum(Priority taskPriority)
+        {
+            if(Enum.IsDefined(typeof(Priority), taskPriority))
+            {
+                return true;
+            }
+            return false;
+                   
+        }
     }
 }

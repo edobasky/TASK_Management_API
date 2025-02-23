@@ -59,10 +59,14 @@ namespace TaskManagement.API.Extensions
                      ValidateIssuer = false,
                      ValidateIssuerSigningKey = false,
                      ValidateLifetime = false,
+                     ClockSkew = TimeSpan.FromMinutes(3), // 1 min for sensitive systems
                  };
              });
 
         public static void ConfigureTokenServ(this IServiceCollection services) =>
             services.AddScoped<IJWTService, JWTService>();
+
+        public static void ConfigureTaskService(this IServiceCollection services) =>
+            services.AddScoped<ITaskService,TaskServiceImp>();
     }
 }

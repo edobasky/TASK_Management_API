@@ -51,6 +51,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.ConfigureJWTAuth(builder.Configuration);
 //builder.Services.AddAuthorization();
 builder.Services.ConfigureTokenServ();
+builder.Services.ConfigureTaskService();
 
 var app = builder.Build();
 

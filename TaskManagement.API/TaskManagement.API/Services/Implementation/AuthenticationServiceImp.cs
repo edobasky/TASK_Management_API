@@ -164,5 +164,14 @@ namespace TaskManagement.API.Services.Implementation
             }
 
         }
+
+        public async Task<bool> UserExist(int UserId)
+        {
+            _logger.LogInfo($"UserExist method call || Check for user in the system with userId : {UserId}");
+            var fetchUser = await _appDb.AppUsers.FirstOrDefaultAsync(us => us.Id == UserId);
+
+            if (fetchUser is null) return false;
+            return true;
+        }
     }
 }
