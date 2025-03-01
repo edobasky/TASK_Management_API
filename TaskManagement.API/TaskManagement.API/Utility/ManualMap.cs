@@ -55,6 +55,18 @@ namespace TaskManagement.API.Utility
             return TaskToReturn;
         }
 
+        public static SingleTaskToReturnDto MapToTaskReturn(TaskItem taskItem)
+        {
+            return new SingleTaskToReturnDto
+            {
+                Id = taskItem.Id,
+                Status = taskItem.Status,
+                Priority = taskItem.Priority,
+                DueDate = taskItem.DueDate,
+                Description = taskItem.Description
+            };
+        }
+
         public static bool verifyEnum(Priority taskPriority)
         {
             if(Enum.IsDefined(typeof(Priority), taskPriority))

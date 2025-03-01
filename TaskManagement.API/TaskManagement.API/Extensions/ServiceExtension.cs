@@ -19,7 +19,7 @@ namespace TaskManagement.API.Extensions
                {
                    builder.AllowAnyOrigin();
                    builder.AllowAnyMethod();
-                   builder.AllowAnyHeader();
+                   builder.AllowAnyHeader().WithExposedHeaders("X-Pagination");
                });
            });
         }
